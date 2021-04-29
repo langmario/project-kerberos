@@ -14,9 +14,15 @@ app.post('/parse', (req, res) => {
 		return res.sendStatus(400);
 	}
 
-	const result = parseNumber(phoneNumber);
+	try {
+		const result = parseNumber(phoneNumber);
 
-	return res.json(result);
+		return res.json(result);
+	} catch (error) {
+		console.error(error);
+		res.status(400).json({ error: error.message });
+	}
+
 });
 
 export default app;
