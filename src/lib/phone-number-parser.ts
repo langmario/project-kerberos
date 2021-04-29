@@ -7,6 +7,38 @@ const AREA_CODE_REGEX = /^(\(0\)|0)?\(?(?<area>[1-9][0-9]{1,3})\)?[\/-]?/;
 const TELEPHONE_PREFIX_REGEX = /^\[?(?<telephonePrefix>[0-9]+)[\/\-\] ]?/;
 const LINE_NUMBER_REGEX = /^(?<lineNumber>[0-9]+)[\]]?/;
 
+export function isPhoneNumberValid(phoneNumber: string): boolean {
+	let paranthesisOpened = [];
+	let squareBracketsOpened = [];
+
+	for (let i = 0; i < phoneNumber.length; i++) {
+		const char = phoneNumber[i];
+		if (char === '[') {
+			squareBracketsOpened.push(i);
+			continue;
+		}
+		if (char === ']') {
+			if (squareBracketsOpened.length === 0) {
+				return false;
+			} else {
+				squareBracketsOpened.pop();
+			}
+		}
+		if (char === '(') {
+			paranthesisOpened.push(i);
+		}
+		if (char === ')') {
+			if (paranthesisOpened.length === 0) {
+				return false;
+			} else {
+				paranthesisOpened.pop();
+			}
+		}
+	}
+
+	return paranthesisOpened.length === 0 && squareBracketsOpened.length === 0;
+}
+
 export function extractCountryCode(stage: PhoneNumberStage): PhoneNumberStage {
 	const phoneNumber = stage.remaining;
 	const matches = phoneNumber.match(COUNTRY_CODE_REGEX);
@@ -15,13 +47,13 @@ export function extractCountryCode(stage: PhoneNumberStage): PhoneNumberStage {
 
 	if (matches && matches.groups?.country) {
 		countryCode = Number(matches.groups.country);
-		remaining = remaining.slice(matches[0].length).trim();
+		remaining = phoneNumber.slice(matches[0].length).trim();
 	}
 
 	return {
 		...stage,
 		remaining,
-		countryCode: countryCode,
+		countryCode,
 	};
 }
 
@@ -43,9 +75,7 @@ export function extractAreaCode(stage: PhoneNumberStage): PhoneNumberStage {
 	}
 }
 
-export function exctractTelephonePrefix(
-	stage: PhoneNumberStage
-): PhoneNumberStage {
+export function exctractTelephonePrefix(stage: PhoneNumberStage): PhoneNumberStage {
 	const phoneNumber = stage.remaining;
 	const matches = phoneNumber.match(TELEPHONE_PREFIX_REGEX);
 
@@ -59,9 +89,7 @@ export function exctractTelephonePrefix(
 			telephonePrefix,
 		};
 	} else {
-		throw new Error(
-			`Could not extract telephone prefix from '${phoneNumber}'`
-		);
+		throw new Error(`Could not extract telephone prefix from '${phoneNumber}'`);
 	}
 }
 
