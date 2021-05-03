@@ -8,6 +8,8 @@ app.use(json());
 app.use(urlencoded({ extended: true }));
 
 app.use(express.static('public'));
+app.use('/bootstrap', express.static('node_modules/bootstrap/dist'));
+app.use('/axios', express.static('node_modules/axios/dist'))
 
 app.post('/parse', (req, res) => {
 	const { phoneNumber } = req.body;

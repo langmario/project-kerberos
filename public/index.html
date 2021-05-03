@@ -4,85 +4,71 @@
 		<meta charset="UTF-8" />
 		<meta http-equiv="X-UA-Compatible" content="IE=edge" />
 		<meta name="viewport" content="width=device-width, initial-scale=1.0" />
-		<title>Document</title>
-		<style>
-			body {
-				margin: 0;
-				font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-				padding: 2rem;
-			}
-
-			table {
-				border: 2px solid #aaa;
-				text-align: center;
-			}
-
-			thead tr {
-				border-bottom: 1px solid #aaa;
-			}
-
-			tbody {
-				font-size: 2rem;
-			}
-
-			td, th {
-				padding: 0.2rem;
-			}
-
-			form {
-				margin-bottom: 1rem;
-			}
-
-			form input, form button {
-				padding: 0.5rem;
-			}
-
-		</style>
+		<title>Phone number parser UI</title>
+		<link rel="stylesheet" href="/bootstrap/css/bootstrap-reboot.min.css" />
+		<link rel="stylesheet" href="/bootstrap/css/bootstrap.min.css" />
 	</head>
 	<body>
-		<form id="form">
-			<input type="text" id="phone-number" />
-			<button type="submit">Submit</button>
-		</form>
+		<div class="container mt-4">
+			<form id="form">
+				<div class="form-group">
+					<input
+						class="form-control form-control-lg"
+						type="text"
+						id="phone-number"
+						placeholder="Phone number"
+					/>
+				</div>
+				<button class="btn btn-block btn-primary" type="submit">Submit</button>
+			</form>
 
-		<table>
-			<thead>
-				<tr>
-					<th>Country Code</th>
-					<th>Area Code</th>
-					<th>Telephone Prefix</th>
-					<th>Line Number</th>
-				</tr>
-			</thead>
-			<tbody>
-				<tr>
-					<td id="country-code"></td>
-					<td id="area-code"></td>
-					<td id="telephone-prefix"></td>
-					<td id="line-number"></td>
-				</tr>
-			</tbody>
-		</table>
+			<table class="table mt-4 text-center">
+				<thead>
+					<tr>
+						<th>Country Code</th>
+						<th>Area Code</th>
+						<th>Telephone Prefix</th>
+						<th>Line Number</th>
+					</tr>
+				</thead>
+				<tbody>
+					<tr>
+						<td id="country-code"></td>
+						<td id="area-code"></td>
+						<td id="telephone-prefix"></td>
+						<td id="line-number"></td>
+					</tr>
+				</tbody>
+			</table>
 
+			<p class="lead mt-3 text-center" id="status"></p>
+		</div>
+
+		<script src="/axios/axios.min.js"></script>
 		<script>
 			var form = document.querySelector('#form');
 			form.addEventListener('submit', async (event) => {
 				event.preventDefault();
 
 				const phoneNumberValue = document.querySelector('#phone-number').value;
-				const response = await fetch('/parse', {
-					method: 'POST',
-					headers: {
-						'Content-Type': 'application/json',
-					},
-					body: JSON.stringify({ phoneNumber: phoneNumberValue }),
-				});
-				if (response.ok) {
-					const parsed = await response.json();
-					document.querySelector('#country-code').textContent = '+' + parsed.countryCode;
-					document.querySelector('#area-code').textContent = parsed.areaCode;
-					document.querySelector('#telephone-prefix').textContent = parsed.telephonePrefix;
-					document.querySelector('#line-number').textContent = parsed.lineNumber;
+
+				try {
+					const { data, status, statusText } = await axios.post('/parse', {
+						phoneNumber: phoneNumberValue,
+					});
+
+					document.querySelector('#status').textContent = `${status} - ${statusText}`;
+					document.querySelector('#country-code').textContent = '+' + data.countryCode;
+					document.querySelector('#area-code').textContent = data.areaCode;
+					document.querySelector('#telephone-prefix').textContent = data.telephonePrefix;
+					document.querySelector('#line-number').textContent = data.lineNumber;
+				} catch (error) {
+					console.log({ error });
+					if (error.response.status === 400) {
+						document.querySelector('#status').textContent = `Invalid phone number: '${phoneNumberValue}'`;
+					} else {
+						document.querySelector('#status').textContent = error.message;
+					}
 				}
 			});
 		</script>
