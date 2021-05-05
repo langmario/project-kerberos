@@ -42,11 +42,11 @@ export function isPhoneNumberValid(phoneNumber: string): boolean {
 export function extractCountryCode(stage: PhoneNumberStage): PhoneNumberStage {
 	const phoneNumber = stage.remaining;
 	const matches = phoneNumber.match(COUNTRY_CODE_REGEX);
-	let countryCode: number = Number(DEFAULT_COUNTRY_CODE);
+	let countryCode: string = DEFAULT_COUNTRY_CODE;
 	let remaining = phoneNumber;
 
 	if (matches && matches.groups?.country) {
-		countryCode = Number(matches.groups.country);
+		countryCode = matches.groups.country.trim();
 		remaining = phoneNumber.slice(matches[0].length).trim();
 	}
 
@@ -62,7 +62,7 @@ export function extractAreaCode(stage: PhoneNumberStage): PhoneNumberStage {
 	const matches = phoneNumber.match(AREA_CODE_REGEX);
 
 	if (matches && matches.groups?.area) {
-		const areaCode = Number(matches.groups.area);
+		const areaCode = matches.groups.area.trim();
 		const remaining = phoneNumber.slice(matches[0].length).trim();
 
 		return {
@@ -80,7 +80,7 @@ export function exctractTelephonePrefix(stage: PhoneNumberStage): PhoneNumberSta
 	const matches = phoneNumber.match(TELEPHONE_PREFIX_REGEX);
 
 	if (matches && matches.groups?.telephonePrefix) {
-		const telephonePrefix = Number(matches.groups.telephonePrefix);
+		const telephonePrefix = matches.groups.telephonePrefix.trim();
 		const remaining = phoneNumber.slice(matches[0].length).trim();
 
 		return {
@@ -98,7 +98,7 @@ export function extractLineNumber(stage: PhoneNumberStage): PhoneNumberStage {
 	const matches = phoneNumber.match(LINE_NUMBER_REGEX);
 
 	if (matches && matches.groups?.lineNumber) {
-		const lineNumber = Number(matches.groups.lineNumber);
+		const lineNumber = matches.groups.lineNumber.trim();
 		const remaining = phoneNumber.slice(matches[0].length).trim();
 
 		return {
@@ -135,7 +135,7 @@ export function parseNumber(input: string): PhoneNumber {
 	return {
 		countryCode: stage.countryCode!,
 		areaCode: stage.areaCode!,
-		telephonePrefix: stage.telephonePrefix,
+		telephonePrefix: stage.telephonePrefix!,
 		lineNumber: stage.lineNumber,
 	};
 }

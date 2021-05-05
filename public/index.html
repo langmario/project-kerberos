@@ -64,7 +64,7 @@
 					document.querySelector('#line-number').textContent = data.lineNumber;
 				} catch (error) {
 					console.log({ error });
-					if (error.response.status === 400) {
+					if (error.response?.status === 400) {
 						document.querySelector('#status').textContent = `Invalid phone number: '${phoneNumberValue}'`;
 					} else {
 						document.querySelector('#status').textContent = error.message;

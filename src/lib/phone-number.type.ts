@@ -1,8 +1,8 @@
 export interface PhoneNumber {
-	countryCode: number;
-	areaCode: number;
-	telephonePrefix?: number;
-	lineNumber?: number;
+	countryCode: string;
+	areaCode: string;
+	telephonePrefix: string;
+	lineNumber?: string;
 }
 
 
