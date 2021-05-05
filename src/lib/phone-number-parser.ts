@@ -26,6 +26,7 @@ export function isPhoneNumberValid(phoneNumber: string): boolean {
 		}
 		if (char === '(') {
 			paranthesisOpened.push(i);
+			continue;
 		}
 		if (char === ')') {
 			if (paranthesisOpened.length === 0) {
